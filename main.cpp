@@ -15,6 +15,11 @@ SDL_Window* gWindow{ nullptr };
 SDL_Renderer* gRenderer{ nullptr };
 SDL_Surface* gSurface{ nullptr };
 SDL_Texture* gTexture{ nullptr };
+TTF_Font* gFont{ nullptr };
+TTF_TextEngine* gTextEngine{ nullptr };
+TTF_Text* gText{ nullptr };
+std::string imagePath{ "assets/test.bmp" };
+std::string fontPath{"assets/KiwiSoda.ttf" };
 
 
 bool init() {
@@ -32,6 +37,9 @@ bool init() {
         }
         else {
             gRenderer = SDL_CreateRenderer(gWindow, nullptr);
+            TTF_Init();
+            gFont = TTF_OpenFont(fontPath.c_str(), 100);
+            gTextEngine = TTF_CreateRendererTextEngine(gRenderer);
         }
     }
 
@@ -40,7 +48,6 @@ bool init() {
 
 bool loadMedia() {
     bool success{ true };
-    std::string imagePath{ "assets/test.bmp" };
     if ( gSurface = SDL_LoadBMP(imagePath.c_str() ); gSurface == nullptr ) {
         SDL_Log( "Unable to load image %s! SDL Error: %s\n", imagePath.c_str(), SDL_GetError() );
         success = false;
@@ -63,6 +70,10 @@ void close() {
     SDL_DestroyRenderer( gRenderer );
     gRenderer = nullptr;
 
+    TTF_DestroyText(gText);
+    TTF_DestroyRendererTextEngine(gTextEngine);
+    TTF_CloseFont( gFont );
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -93,6 +104,9 @@ int main( int argc, char* args[] ) {
 
                 SDL_RenderClear( gRenderer );
                 SDL_RenderTexture( gRenderer, gTexture, nullptr, nullptr);
+                gText = TTF_CreateText(gTextEngine, gFont, "Hello World", 0);
+                TTF_SetTextColor(gText, 18, 53, 36, 255);
+                TTF_DrawRendererText(gText, 1, 0);
                 SDL_RenderPresent( gRenderer );
             }
         }
