@@ -2,6 +2,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <string>
+#include <SDL3_ttf/SDL_ttf.h>
 
 constexpr int kScreenWidth{480};
 constexpr int kScreenHeight{640};
@@ -11,8 +12,10 @@ bool loadMedia();
 void close();
 
 SDL_Window* gWindow{ nullptr };
-SDL_Surface* gScreenSurface{ nullptr };
-SDL_Surface* gHelloWorld{ nullptr };
+SDL_Renderer* gRenderer{ nullptr };
+SDL_Surface* gSurface{ nullptr };
+SDL_Texture* gTexture{ nullptr };
+
 
 bool init() {
 
@@ -28,7 +31,7 @@ bool init() {
             success = false;
         }
         else {
-            gScreenSurface = SDL_GetWindowSurface( gWindow );
+            gRenderer = SDL_CreateRenderer(gWindow, nullptr);
         }
     }
 
@@ -38,22 +41,27 @@ bool init() {
 bool loadMedia() {
     bool success{ true };
     std::string imagePath{ "assets/test.bmp" };
-    if ( gHelloWorld = SDL_LoadBMP(imagePath.c_str() ); gHelloWorld == nullptr ) {
+    if ( gSurface = SDL_LoadBMP(imagePath.c_str() ); gSurface == nullptr ) {
         SDL_Log( "Unable to load image %s! SDL Error: %s\n", imagePath.c_str(), SDL_GetError() );
         success = false;
     }
+
+    gTexture = SDL_CreateTextureFromSurface(gRenderer, gSurface);
+    SDL_DestroySurface( gSurface );
+    gSurface = nullptr;
 
     return success;
 }
 
 void close() {
     //Clean up surface
-    SDL_DestroySurface( gHelloWorld );
-    gHelloWorld = nullptr;
+    SDL_DestroyTexture( gTexture );
+    gTexture = nullptr;
 
     SDL_DestroyWindow( gWindow );
     gWindow = nullptr;
-    gScreenSurface = nullptr;
+    SDL_DestroyRenderer( gRenderer );
+    gRenderer = nullptr;
 
     SDL_Quit();
 }
@@ -83,11 +91,9 @@ int main( int argc, char* args[] ) {
                     }
                 }
 
-                SDL_FillSurfaceRect( gScreenSurface, nullptr, SDL_MapSurfaceRGB( gScreenSurface, 0xFF, 0xFF, 0xFF ) );
-
-                SDL_BlitSurface( gHelloWorld, nullptr, gScreenSurface, nullptr);
-
-                SDL_UpdateWindowSurface( gWindow );
+                SDL_RenderClear( gRenderer );
+                SDL_RenderTexture( gRenderer, gTexture, nullptr, nullptr);
+                SDL_RenderPresent( gRenderer );
             }
         }
 
