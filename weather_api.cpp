@@ -3,11 +3,10 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-auto reqLink = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m";
+std::string reqLink = "https://api.open-meteo.com/v1/forecast?latitude=-34.9287&longitude=138.5986&current=temperature_2m,apparent_temperature&forecast_days=1";
 
-void get_weather_data() {
+json get_weather_data() {
     auto response = cpr::Get(cpr::Url{reqLink});
-    auto weather_data = response.text;
-    printf(weather_data.c_str());
+    return json::parse(response.text);
 }
 

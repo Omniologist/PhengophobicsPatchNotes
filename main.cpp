@@ -5,8 +5,8 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include "weather_api.hpp"
 
-constexpr int kScreenWidth{480};
-constexpr int kScreenHeight{640};
+constexpr int kScreenWidth{640};
+constexpr int kScreenHeight{480};
 
 bool init();
 bool loadMedia();
@@ -95,17 +95,20 @@ int main( int argc, char* args[] ) {
             SDL_Event e;
             SDL_zero( e );
 
+            json weather_data = get_weather_data();
+            double temp = weather_data["current"]["temperature_2m"];
+            double feel_temp = weather_data["current"]["apparent_temperature"];
+            std::string temperatures = std::format("Adelaide\nTemp:{}\nFeel Temp:{}\n", temp, feel_temp);
+            gText = TTF_CreateText(gTextEngine, gFont, temperatures.c_str(), 0);
+            TTF_SetTextColor(gText, 18, 53, 36, 255);
+
             while ( quit == false ) {
                 while ( SDL_PollEvent( &e ) == true ) {
                     if ( e.type == SDL_EVENT_QUIT ) {
                         quit = true;
                     }
                 }
-                get_weather_data();
                 SDL_RenderClear( gRenderer );
-                SDL_RenderTexture( gRenderer, gTexture, nullptr, nullptr);
-                gText = TTF_CreateText(gTextEngine, gFont, "Hello World", 0);
-                TTF_SetTextColor(gText, 18, 53, 36, 255);
                 TTF_DrawRendererText(gText, 1, 0);
                 SDL_RenderPresent( gRenderer );
             }

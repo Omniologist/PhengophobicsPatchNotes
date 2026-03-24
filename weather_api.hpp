@@ -1,3 +1,5 @@
 #pragma once
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
-void get_weather_data();
+json get_weather_data();
