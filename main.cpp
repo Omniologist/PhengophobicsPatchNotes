@@ -3,6 +3,7 @@
 #include <SDL3/SDL_main.h>
 #include <string>
 #include <SDL3_ttf/SDL_ttf.h>
+#include "weather_api.hpp"
 
 constexpr int kScreenWidth{480};
 constexpr int kScreenHeight{640};
@@ -20,7 +21,6 @@ TTF_TextEngine* gTextEngine{ nullptr };
 TTF_Text* gText{ nullptr };
 std::string imagePath{ "assets/test.bmp" };
 std::string fontPath{"assets/KiwiSoda.ttf" };
-
 
 bool init() {
 
@@ -101,7 +101,7 @@ int main( int argc, char* args[] ) {
                         quit = true;
                     }
                 }
-
+                get_weather_data();
                 SDL_RenderClear( gRenderer );
                 SDL_RenderTexture( gRenderer, gTexture, nullptr, nullptr);
                 gText = TTF_CreateText(gTextEngine, gFont, "Hello World", 0);
